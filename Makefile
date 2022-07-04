@@ -14,3 +14,7 @@ dist:
 .PHONY: pypi
 pypi: dist
 	twine upload dist/expsweep-$(version).tar.gz
+
+.PHONY: clean
+clean:
+	rm dist -rf

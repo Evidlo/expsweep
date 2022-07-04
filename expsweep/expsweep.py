@@ -28,9 +28,18 @@ def experiment(func, disable_print=False, repeat=1, merge=False, cpu_count=None,
     # https://github.com/tqdm/tqdm/issues/375#issuecomment-576863223
     # getattr(tqdm, '_instances', {}).clear()
 
+
+    # make non-interable kwargs iterable
+    iterables = []
+    for val in kwargs.values():
+        try:
+            iter(val)
+            iterables.append(val)
+        except TypeError:
+            iterables.append([val])
     # turn parameters into list of dicts to pass to pqdm
     param_dicts = []
-    for params in product(*kwargs.values()):
+    for params in product(*iterables):
         param_dict = dict(zip(kwargs.keys(), params))
         param_dicts += [param_dict] * repeat
 

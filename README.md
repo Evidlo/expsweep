@@ -1,11 +1,10 @@
-# expsweep - Experiment Sweeper
+# expsweep - Numerical Experiment Sweeper
 
-Easily run Monte Carlo experiments on a function by sweeping parameters and running multiple repetitions.
-Results are returned in a Pandas dataframe that can easily be plotted.
+Runs Monte Carlo experiments on a function with swept-parameters and collects results into a table.
 
 ## Features
 
-- automatically parallelizes experiment
+- automatically parallelizes experiment and displays a progress bar
 - results are returned as a Pandas table which can be easily plotted in seaborn
 
 ## Quickstart
@@ -28,12 +27,10 @@ def exp(x):
 
 # Run Monte Carlo experiment on exp() function.
 # Sweep parameter x (with 20 repetitions for each x) and collect results.
-# Parallelize with 32 cores
 mc = expsweep.experiment(
     exp,
     repeat=20,
     x=range(10),
-    cpu_count=32,
 )
 
 """
@@ -58,7 +55,6 @@ mc = expsweep.experiment(
     exp,
     repeat=20,
     x=range(10),
-    cpu_count=32,
     merge=True
 )
 
@@ -96,11 +92,12 @@ def exp(x, y, z):
     ...
     return {'experiment1': ...}
     
+# sweep 2 variables (and 1 fixed) with a single repetition at each point
 mc = expsweep.experiment(
     exp,
     x=range(10),
     y=range(10),
-    z=[1]
+    z=1
 )
 
 >>> mc

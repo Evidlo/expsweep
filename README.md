@@ -77,6 +77,8 @@ plot = sns.lineplot(
     
 ```
 
+![](example_plot.png)
+
 ## Troubleshooting
 
     AttributeError: Can't pickle local object ...

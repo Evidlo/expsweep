@@ -6,9 +6,8 @@ from operator import mul
 from multiprocessing import cpu_count as cpus
 import pandas as pd
 
-def combination_experiment(func, disable_print=False, iterations=1, category_name=None,
-                           value_name=None, cpu_count=None, backend='processes',
-                           pqdm_kwargs={}, **kwargs):
+def experiment(func, disable_print=False, repeat=1, merge=False, cpu_count=None,
+               backend='processes', pqdm_kwargs={}, **kwargs):
     """
     Run `func` with all combinations of input parameters and return results in
     dataframe
@@ -17,16 +16,15 @@ def combination_experiment(func, disable_print=False, iterations=1, category_nam
         func (function): function which returns a dict of results
             use `return dict(**locals())` to return all function variables
         disable_print (boolean): disable tqdm printing
-        iterations (int): number of iterations to repeat each experiment
-        category_name (str): number of iterations to repeat each experiment
-        value_name (str): number of iterations to repeat each experiment
+        repeat (int): number of repetitions for each combination of parameters
+        merge (boolean): whether to merge experiment results into a single column
         cpu_count (int): number of cores/cpus to use (default: use all but 1 core)
         backend ('str'): pqdm backend to use (default: 'processes')
         pqdm_kwargs (dict): dict of keyword args to pass to pqdm
         kwargs: keyword arguments that will be passed to `func`
     """
 
-      # clear any left over progressbars if in ipython
+    # clear any left over progressbars if in ipython
     # https://github.com/tqdm/tqdm/issues/375#issuecomment-576863223
     # getattr(tqdm, '_instances', {}).clear()
 
@@ -34,7 +32,7 @@ def combination_experiment(func, disable_print=False, iterations=1, category_nam
     param_dicts = []
     for params in product(*kwargs.values()):
         param_dict = dict(zip(kwargs.keys(), params))
-        param_dicts.append(param_dict)
+        param_dicts += [param_dict] * repeat
 
     if cpu_count is None:
         cpu_count = cpus() - 1
@@ -63,13 +61,16 @@ def combination_experiment(func, disable_print=False, iterations=1, category_nam
         axis=1
     )
 
-    # melt result columsn together and create new categorical column
-    if category_name is not None and value_name is not None:
+    # melt result columns together and create new categorical column
+    # if category_name is not None and value_name is not None:
+    if merge:
         results = merge_columns(
             results,
             return_values[0].keys(),
-            category_name,
-            value_name
+            "experiment",
+            "result"
+            # category_name,
+            # value_name
         )
 
     return results
@@ -77,7 +78,7 @@ def combination_experiment(func, disable_print=False, iterations=1, category_nam
     # results = []
     # with tqdm(desc='Trials', total=total, leave=None, disable=disable_print) as tqdm_bar:
     #     for values in product(*kwargs.values()):
-    #         for _ in range(iterations):
+    #         for _ in range(repeat):
     #             func_kwargs = dict(zip(kwargs.keys(), values))
     #             result = func(**func_kwargs)
     #             tqdm_bar.update(1)

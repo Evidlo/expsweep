@@ -5,7 +5,7 @@
 .ONESHELL:
 .SHELLFLAGS = -ec
 
-version := $(shell python -c "exec(open('expsweep/version.py').read());print(__version__)")
+version := $(shell python -c "exec(open('expsweep/version.py').read());print(version)")
 
 .PHONY: dist
 dist:

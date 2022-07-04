@@ -6,6 +6,7 @@ import pandas as pd
 
 class Tests(unittest.TestCase):
 
+    # check table returned by experiment()
     def test_experiment(self):
 
         global exp
@@ -24,9 +25,10 @@ class Tests(unittest.TestCase):
         summed_equal = mc[['a', 'b', 'c']].sum(axis=1) == mc['sum']
         self.assertTrue(summed_equal.all())
 
+    # check that experiment result columns are merged when merge=True
     def test_experiment_merging(self):
         global exp
-        def exp(a, b, c):
+        def exp(a, b, c, d):
             return {'sum1': a + b + c, 'sum2': a + b}
 
         mc = expsweep.experiment(
@@ -34,6 +36,7 @@ class Tests(unittest.TestCase):
             a=[1, 2, 3, 4],
             b=[1, 2, 3, 4],
             c=[1, 2, 3, 4],
+            d=1,
             # category_name='method',
             # value_name='sum'
             merge=True,
@@ -53,6 +56,16 @@ class Tests(unittest.TestCase):
         summed_equal = sum2_rows[['a', 'b']].sum(axis=1) == sum2_rows['result']
         self.assertTrue(summed_equal.all())
 
+    # check that an exception is raised when there is an error in the experiment
+    def test_experiment_exception(self):
+        global exp
+        def exp(a):
+            return {'foo': a}
+
+        with self.assertRaises(TypeError):
+            expsweep.experiment(exp, a=1, b=2)
+
+    # test merge_columns() function
     def test_merge_columns(self):
         table = pd.DataFrame({
             'method1': [18.748, 20.657, 19.405, 19.793, 18.116],

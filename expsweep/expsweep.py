@@ -61,6 +61,10 @@ def experiment(func, disable_print=False, repeat=1, merge=False, cpu_count=None,
         **pqdm_kwargs
     )
 
+    for retval in return_values:
+        if isinstance(retval, Exception):
+            raise retval
+
     # insert function arguments into table
     results = pd.concat(
         [

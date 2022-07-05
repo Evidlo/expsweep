@@ -97,7 +97,7 @@ mc = expsweep.experiment(
     exp,
     x=range(10),
     y=range(10),
-    z=1
+    z=[1]
 )
 
 >>> mc

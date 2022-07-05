@@ -28,20 +28,27 @@ def experiment(func, disable_print=False, repeat=1, merge=False, cpu_count=None,
     # https://github.com/tqdm/tqdm/issues/375#issuecomment-576863223
     # getattr(tqdm, '_instances', {}).clear()
 
+    iterables = kwargs.values()
 
     # make non-interable kwargs iterable
-    iterables = []
-    for val in kwargs.values():
-        try:
-            iter(val)
-            iterables.append(val)
-        except TypeError:
-            iterables.append([val])
+    # iterables = []
+    # for val in kwargs.values():
+    #     if hasattr(val, '__iter__'):
+    #         iterables.append(val)
+    #     else:
+    #         iterables.append([val])
+
+    # assert kwargs are iterable
+    for key, val in kwargs.items():
+        if not hasattr(val, '__iter__'):
+            raise TypeError("experiment argument '{}' is not iterable".format(key))
+
     # turn parameters into list of dicts to pass to pqdm
     param_dicts = []
     for params in product(*iterables):
         param_dict = dict(zip(kwargs.keys(), params))
         param_dicts += [param_dict] * repeat
+
 
     if cpu_count is None:
         cpu_count = cpus() - 1
@@ -87,21 +94,6 @@ def experiment(func, disable_print=False, repeat=1, merge=False, cpu_count=None,
         )
 
     return results
-
-    # results = []
-    # with tqdm(desc='Trials', total=total, leave=None, disable=disable_print) as tqdm_bar:
-    #     for values in product(*kwargs.values()):
-    #         for _ in range(repeat):
-    #             func_kwargs = dict(zip(kwargs.keys(), values))
-    #             result = func(**func_kwargs)
-    #             tqdm_bar.update(1)
-
-    #             if type(result) is not dict:
-    #                 result = {'result': result}
-
-    #             results.append({**result, **func_kwargs})
-
-    # return pd.DataFrame(results)
 
 
 def merge_columns(table, columns, var_name, value_name):

@@ -36,7 +36,7 @@ class Tests(unittest.TestCase):
             a=[1, 2, 3, 4],
             b=[1, 2, 3, 4],
             c=[1, 2, 3, 4],
-            d=1,
+            d=[1],
             # category_name='method',
             # value_name='sum'
             merge=True,
